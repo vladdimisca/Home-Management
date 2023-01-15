@@ -28,4 +28,7 @@ public class Family {
 
     @OneToMany(mappedBy = "family", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     List<FamilyMember> familyMembers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "family", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    List<Task> tasks = new ArrayList<>();
 }
