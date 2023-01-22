@@ -23,10 +23,10 @@ public class FamilyController {
 
     @PostMapping
     public ResponseEntity<FamilyDto> create(@Valid @RequestBody FamilyDto familyDto) {
-        Family family = familyMapper.mapToEntity(familyDto);
+        Family family = familyService.create(familyMapper.mapToEntity(familyDto));
         return ResponseEntity
                 .created(URI.create("/api/families/" + family.getId()))
-                .body(familyMapper.mapToDto(familyService.create(family)));
+                .body(familyMapper.mapToDto(family));
     }
 
     @PutMapping("/{id}")
@@ -52,11 +52,4 @@ public class FamilyController {
         familyService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-
-    @PostMapping("/{id}/join")
-    public ResponseEntity<?> joinFamily(@PathVariable("id") UUID id) {
-        familyService.joinFamily(id);
-        return ResponseEntity.noContent().build();
-    }
-
 }

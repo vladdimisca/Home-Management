@@ -8,6 +8,7 @@ import com.amss.homemanagement.model.Family;
 import com.amss.homemanagement.model.FamilyMember;
 import com.amss.homemanagement.model.User;
 import com.amss.homemanagement.repository.FamilyRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class FamilyService {
     public Family updateById(UUID id, Family family) {
         User user = userService.getById(securityService.getUserId());
         Family existingFamily = getById(id);
-        checkUserIsFamilyMemberWithAdminRights(user, family);
+        checkUserIsFamilyMemberWithAdminRights(user, existingFamily);
 
         existingFamily.setName(family.getName());
         return familyRepository.save(existingFamily);
@@ -55,15 +56,12 @@ public class FamilyService {
         Family family = getById(id);
         checkUserIsFamilyMemberWithAdminRights(user, family);
 
-        familyRepository.delete(getById(id));
+        familyRepository.delete(family);
     }
 
-    public void joinFamily(UUID id) {
-        Family family = getById(id);
-        User user = userService.getById(securityService.getUserId());
-
+    public void addMember(User user, Family family) {
         if (getFamilyMember(user, family).isPresent()) {
-            throw new ConflictException(ErrorMessage.ALREADY_PART_OF_FAMILY);
+            throw new ConflictException(ErrorMessage.ALREADY_EXISTS, "Member");
         }
         FamilyMember familyMember = createFamilyMember(user, family, false);
         family.getFamilyMembers().add(familyMember);
