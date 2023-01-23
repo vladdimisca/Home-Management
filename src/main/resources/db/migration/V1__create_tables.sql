@@ -27,6 +27,17 @@ CREATE TABLE IF NOT EXISTS `family_members` (
     FOREIGN KEY (`family_id`) REFERENCES `families`(`id`)
 );
 
+CREATE TABLE IF NOT EXISTS `requests` (
+    `id` VARCHAR(50) NOT NULL,
+    `user_id` VARCHAR(50) NOT NULL,
+    `family_id` VARCHAR(50) NOT NULL,
+    `status` VARCHAR(50) NOT NULL,
+
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
+    FOREIGN KEY (`family_id`) REFERENCES `families`(`id`)
+);
+
 CREATE TABLE IF NOT EXISTS `tasks` (
     `id` VARCHAR(50) NOT NULL,
     `user_id` VARCHAR(50) NOT NULL,

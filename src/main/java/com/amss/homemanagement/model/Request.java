@@ -5,13 +5,14 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcTypeCode;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "tasks")
-public class Task {
+@Table(name = "requests")
+public class Request {
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -22,28 +23,15 @@ public class Task {
     @JdbcTypeCode(java.sql.Types.VARCHAR)
     private UUID id;
 
-    @Column(name = "title")
-    private String title;
-
-    @Column(name = "description")
-    private String description;
-
-    @Column(name = "state")
+    @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private State state;
-
-    @Column(name = "priority")
-    @Enumerated(EnumType.STRING)
-    private Priority priority;
-
-    @Column(name = "date")
-    private LocalDateTime date;
-
-    @ManyToOne
-    @JoinColumn(name = "family_id", referencedColumnName = "id")
-    private Family family;
+    private RequestStatus status;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "family_id", referencedColumnName = "id")
+    private Family family;
 }
