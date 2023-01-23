@@ -2,9 +2,6 @@ package com.amss.homemanagement.service;
 
 import com.amss.homemanagement.exception.ErrorMessage;
 import com.amss.homemanagement.exception.ExceptionFactory;
-import com.amss.homemanagement.exception.model.ConflictException;
-import com.amss.homemanagement.exception.model.ForbiddenException;
-import com.amss.homemanagement.exception.model.NotFoundException;
 import com.amss.homemanagement.model.*;
 import com.amss.homemanagement.repository.RequestRepository;
 import jakarta.transaction.Transactional;
@@ -30,10 +27,10 @@ public class RequestService {
         Family family = familyService.getById(familyId);
 
         if (getFamilyMember(user, family).isPresent()) {
-            throw new ConflictException(ErrorMessage.ALREADY_PART_OF_FAMILY, family.getId());
+            throw new ExceptionFactory().createException(HttpStatus.CONFLICT, ErrorMessage.ALREADY_PART_OF_FAMILY, family.getId());
         }
         if (hasAnyPendingRequest(user, family)) {
-            throw new ConflictException(ErrorMessage.ALREADY_EXISTS, "A pending request");
+            throw new ExceptionFactory().createException(HttpStatus.CONFLICT, ErrorMessage.ALREADY_EXISTS, "A pending request");
         }
 
         request.setUser(user);
@@ -48,7 +45,7 @@ public class RequestService {
 
         Optional<FamilyMember> member = getFamilyMember(user, request.getFamily());
         if (!request.getUser().equals(user) && (member.isEmpty() || !member.get().getIsAdmin())) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND, "request", id);
+            throw new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "request", id);
         }
 
         return request;
@@ -61,10 +58,10 @@ public class RequestService {
         Optional<FamilyMember> member = getFamilyMember(user, existingRequest.getFamily());
 
         if (member.isEmpty() || !member.get().getIsAdmin()) {
-            throw new ForbiddenException(ErrorMessage.FORBIDDEN);
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.FORBIDDEN);
         }
         if (existingRequest.getStatus() != RequestStatus.PENDING) {
-            throw new ForbiddenException(ErrorMessage.FORBIDDEN); // TODO: Change error message
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.FORBIDDEN); // TODO: Change error message
         }
         if (requestStatus == RequestStatus.ACCEPTED) {
             familyService.addMember(existingRequest.getUser(), existingRequest.getFamily());
@@ -81,7 +78,7 @@ public class RequestService {
         List<Request> requests = requestRepository.findByFamily_IdAndStatus(familyId, status);
 
         if (member.isEmpty()) {
-            throw new ForbiddenException(ErrorMessage.FORBIDDEN);
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.FORBIDDEN);
         }
         if (member.get().getIsAdmin()) {
             return requests;
@@ -94,7 +91,7 @@ public class RequestService {
         Request request = fetchRequestById(id);
         // TODO: check if the user is an admin and allow only pending requests to be deleted
         if (!request.getUser().equals(user)) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND, "request", id);
+            throw new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "request", id);
         }
 
         requestRepository.delete(getById(id));
