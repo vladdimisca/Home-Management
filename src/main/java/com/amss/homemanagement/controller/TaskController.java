@@ -26,7 +26,7 @@ public class TaskController {
     public ResponseEntity<TaskDto> create(@Valid @RequestBody TaskDto taskDto) {
         Task task = taskService.create(taskMapper.mapToEntity(taskDto), taskDto.familyId());
         return ResponseEntity
-                .created(URI.create("/api/families/{familyId}/tasks" + task.getId()))
+                .created(URI.create("/api/tasks/" + task.getId()))
                 .body(taskMapper.mapToDto(task));
     }
 
