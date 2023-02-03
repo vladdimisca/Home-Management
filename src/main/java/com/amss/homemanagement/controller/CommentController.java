@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/families/{familyId}/tasks/{taskId}/comments")
+@RequestMapping("/api/comments")
 @RequiredArgsConstructor
 public class CommentController {
 
@@ -24,44 +24,35 @@ public class CommentController {
     private final CommentMapper commentMapper;
 
     @PostMapping
-    public ResponseEntity<CommentDto> create(@Valid @RequestBody CommentDto commentDto,
-                                             @PathVariable(name = "familyId") UUID familyId,
-                                             @PathVariable(name = "taskId") UUID taskId) {
-        Comment comment = commentService.create(commentMapper.mapToEntity(commentDto), familyId, taskId);
+    public ResponseEntity<CommentDto> create(@Valid @RequestBody CommentDto commentDto) {
+        Comment comment = commentService.create(commentMapper.mapToEntity(commentDto), commentDto.taskId());
         return ResponseEntity
-                .created(URI.create("/api/family/" + familyId + "tasks/" + taskId + "/comments/" + comment.getId()))
+                .created(URI.create("/api/comments/" + comment.getId()))
                 .body(commentMapper.mapToDto(comment));
     }
 
     @GetMapping("/{commentId}")
-    public ResponseEntity<CommentDto> getById(@PathVariable(name = "familyId") UUID familyId,
-                                              @PathVariable(name = "taskId") UUID taskId,
-                                              @PathVariable(name = "commentId") UUID commentId) {
-        Comment comment = commentService.getById(familyId, taskId, commentId);
+    public ResponseEntity<CommentDto> getById(@PathVariable(name = "commentId") UUID commentId) {
+        Comment comment = commentService.getById(commentId);
         return ResponseEntity.ok(commentMapper.mapToDto(comment));
     }
 
     @PutMapping("/{commentId}")
-    public ResponseEntity<CommentDto> update(@PathVariable(name = "familyId") UUID familyId,
-                                             @PathVariable(name = "taskId") UUID taskId,
-                                             @PathVariable(name = "commentId") UUID commentId,
+    public ResponseEntity<CommentDto> update(@PathVariable(name = "commentId") UUID commentId,
                                              @Valid @RequestBody CommentDto commentDto) {
-        Comment comment = commentService.updateById(familyId, taskId, commentId, commentMapper.mapToEntity(commentDto));
+        Comment comment = commentService.updateById(commentId, commentMapper.mapToEntity(commentDto));
         return ResponseEntity.ok(commentMapper.mapToDto(comment));
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<?> delete(@PathVariable(name = "familyId") UUID familyId,
-                                    @PathVariable(name = "taskId") UUID taskId,
-                                    @PathVariable(name = "commentId") UUID commentId) {
-        commentService.deleteById(familyId, taskId, commentId);
+    public ResponseEntity<?> delete(@PathVariable(name = "commentId") UUID commentId) {
+        commentService.deleteById(commentId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping
-    public ResponseEntity<List<CommentDto>> getByTaskId(@PathVariable(name = "familyId") UUID familyId,
-                                                        @PathVariable(name = "taskId") UUID taskId) {
-        List<Comment> comments = commentService.getByTaskId(familyId, taskId);
+    @GetMapping("/task/{taskId}")
+    public ResponseEntity<List<CommentDto>> getByTaskId(@PathVariable(name = "taskId") UUID taskId) {
+        List<Comment> comments = commentService.getByTaskId(taskId);
         return ResponseEntity.ok(comments.stream().map(commentMapper::mapToDto).toList());
     }
 }

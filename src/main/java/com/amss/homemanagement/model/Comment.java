@@ -34,9 +34,9 @@ public class Comment {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @Column(name = "task_id")
-    @JdbcTypeCode(java.sql.Types.VARCHAR)
-    private UUID taskId;
+    @ManyToOne
+    @JoinColumn(name = "task_id", referencedColumnName = "id")
+    private Task task;
 
     @OneToMany(mappedBy = "comment", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     List<Like> likes = new ArrayList<>();

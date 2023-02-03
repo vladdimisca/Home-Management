@@ -11,8 +11,10 @@ import org.mapstruct.Mapping;
 public interface CommentMapper {
 
     @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "task.id", target = "taskId")
     CommentDto mapToDto(Comment comment);
 
     @Mapping(source = "userId", target = "user.id")
+    @Mapping(source = "taskId", target = "task.id")
     Comment mapToEntity(CommentDto commentDto);
 }
