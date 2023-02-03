@@ -6,6 +6,8 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -50,4 +52,7 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "assignee_id", referencedColumnName = "id")
     private User assignee;
+
+    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    List<Comment> comments = new ArrayList<>();
 }
