@@ -15,6 +15,27 @@ CREATE TABLE IF NOT EXISTS `families` (
     PRIMARY KEY (`id`)
 );
 
+CREATE TABLE IF NOT EXISTS `comments` (
+    `id` VARCHAR(50) NOT NULL,
+    `content` VARCHAR(100) NOT NULL,
+    `creation_date` DATETIME NOT NULL,
+    `user_id` VARCHAR(50) NOT NULL,
+    `task_id` VARCHAR(50) NOT NULL,
+
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `likes` (
+    `id` VARCHAR(50) NOT NULL,
+    `creation_date` DATETIME NOT NULL,
+    `user_id` VARCHAR(50) NOT NULL,
+    `comment_id` VARCHAR(50) NOT NULL,
+
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`comment_id`) REFERENCES `comments`(`id`)
+);
+
 CREATE TABLE IF NOT EXISTS `family_members` (
     `id` VARCHAR(50) NOT NULL,
     `member_id` VARCHAR(50) NOT NULL,
