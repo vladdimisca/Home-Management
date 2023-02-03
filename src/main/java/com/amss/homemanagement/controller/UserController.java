@@ -25,10 +25,10 @@ public class UserController {
     @PostMapping
     @PermitAll
     public ResponseEntity<UserDto> create(@Valid @RequestBody UserDto userDto) {
-        User user = userMapper.mapToEntity(userDto);
+        User user = userService.create(userMapper.mapToEntity(userDto));
         return ResponseEntity
                 .created(URI.create("/api/users/" + user.getId()))
-                .body(userMapper.mapToDto(userService.create(user)));
+                .body(userMapper.mapToDto(user));
     }
 
     @PutMapping("/{id}")

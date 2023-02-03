@@ -26,6 +26,12 @@ public class Family {
     @Column(name = "name")
     private String name;
 
+    @OneToMany(mappedBy = "family", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<FamilyMember> familyMembers = new ArrayList<>();
+
     @OneToMany(mappedBy = "family", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-    List<FamilyMember> familyMembers = new ArrayList<>();
+    private List<Request> requests = new ArrayList<>();
+
+    @OneToMany(mappedBy = "family", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    private List<Task> tasks = new ArrayList<>();
 }
