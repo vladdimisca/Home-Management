@@ -7,12 +7,9 @@ import jakarta.validation.constraints.Null;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record CommentDto(
+public record LikeDto(
         @Null
         UUID id,
-
-        @NotBlank
-        String content,
 
         @Null
         LocalDateTime creationDate,
@@ -21,5 +18,5 @@ public record CommentDto(
         UUID userId,
 
         @NotNull
-        UUID taskId
+        UUID commentId
 ) { }

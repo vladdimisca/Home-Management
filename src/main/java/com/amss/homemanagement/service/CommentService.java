@@ -21,7 +21,6 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserService userService;
     private final SecurityService securityService;
-
     private final TaskService taskService;
 
     public Comment create(Comment comment, UUID taskId) {
