@@ -2,7 +2,6 @@ package com.amss.homemanagement.service;
 
 import com.amss.homemanagement.exception.ErrorMessage;
 import com.amss.homemanagement.exception.ExceptionFactory;
-import com.amss.homemanagement.exception.model.ConflictException;
 import com.amss.homemanagement.exception.model.ForbiddenException;
 import com.amss.homemanagement.model.Family;
 import com.amss.homemanagement.model.FamilyMember;
@@ -30,17 +29,18 @@ public class TaskService {
     private final FamilyService familyService;
 
 
-    public Task create(Task task, UUID familyId) {
-        User user = userService.getById(securityService.getUserId());
+    public Task create(Task task, UUID familyId, UUID assigneeId) {
+        User creator = userService.getById(securityService.getUserId());
         Family family = familyService.getById(familyId);
-        if (getFamilyMember(user, family).isEmpty()) {
+        if (getFamilyMember(creator, family).isEmpty()) {
             throw new ForbiddenException(ErrorMessage.FORBIDDEN); //TODO: Change message
         }
 
-        task.setUser(user);
+        task.setCreator(creator);
         task.setFamily(family);
-        task.setDate(LocalDateTime.now());
+        task.setCreationDate(LocalDateTime.now());
         task.setState(TO_DO);
+        task.setAssignee(userService.getById(assigneeId));
         return taskRepository.save(task);
     }
 
@@ -60,16 +60,16 @@ public class TaskService {
         existingTask.setDescription(task.getDescription());
         existingTask.setPriority(task.getPriority());
         existingTask.setTitle(task.getTitle());
+        existingTask.setAssignee(task.getAssignee());
         return taskRepository.save(existingTask);
     }
 
-    public List<Task> getAll() {
-        return taskRepository.findAll();
+    public List<Task> getAllByFamilyId(UUID familyId) {
+        return taskRepository.findByFamily_Id(familyId);
     }
 
     public void deleteById(UUID id) {
-        Task task = getById(id);
-        taskRepository.delete(task);
+        taskRepository.delete(getById(id));
     }
 
     private Optional<FamilyMember> getFamilyMember(User user, Family family) {

@@ -24,9 +24,9 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<TaskDto> create(@Valid @RequestBody TaskDto taskDto) {
-        Task task = taskService.create(taskMapper.mapToEntity(taskDto), taskDto.familyId());
+        Task task = taskService.create(taskMapper.mapToEntity(taskDto), taskDto.familyId(), taskDto.assigneeId());
         return ResponseEntity
-                .created(URI.create("/api/families/{familyId}/tasks" + task.getId()))
+                .created(URI.create("/api/tasks" + task.getId()))
                 .body(taskMapper.mapToDto(task));
     }
 
@@ -42,9 +42,9 @@ public class TaskController {
         return ResponseEntity.ok(taskMapper.mapToDto(task));
     }
 
-    @GetMapping
-    public ResponseEntity<List<TaskDto>> getAll() {
-        List<Task> tasks = taskService.getAll();
+    @GetMapping("/family/{familyId}")
+    public ResponseEntity<List<TaskDto>> getAllByFamilyId(@PathVariable("familyId") UUID familyId) {
+        List<Task> tasks = taskService.getAllByFamilyId(familyId);
         return ResponseEntity.ok(tasks.stream().map(taskMapper::mapToDto).toList());
     }
 
