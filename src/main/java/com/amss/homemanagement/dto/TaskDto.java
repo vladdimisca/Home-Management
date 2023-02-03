@@ -24,6 +24,8 @@ public record TaskDto(
 
         LocalDateTime date,
 
-        UUID familyId
+        UUID familyId,
+
+        UUID assigneeId
 
 ) { }

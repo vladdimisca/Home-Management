@@ -38,16 +38,20 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private Priority priority;
 
-    @Column(name = "date")
-    private LocalDateTime date;
+    @Column(name = "creation_date")
+    private LocalDateTime creationDate;
 
     @ManyToOne
     @JoinColumn(name = "family_id", referencedColumnName = "id")
     private Family family;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    @JoinColumn(name = "creator_id", referencedColumnName = "id")
+    private User creator;
+
+    @ManyToOne
+    @JoinColumn(name = "assignee_id", referencedColumnName = "id")
+    private User assignee;
 
     @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     List<Comment> comments = new ArrayList<>();
