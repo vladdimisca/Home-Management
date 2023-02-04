@@ -75,3 +75,14 @@ CREATE TABLE IF NOT EXISTS `tasks` (
     FOREIGN KEY (`assignee_id`) REFERENCES `users`(`id`),
     FOREIGN KEY (`family_id`) REFERENCES `families`(`id`)
 );
+
+CREATE TABLE IF NOT EXISTS `notifications` (
+    `id` VARCHAR(50) NOT NULL,
+    `user_id` VARCHAR(50) NOT NULL,
+    `task_id` VARCHAR(50) NOT NULL,
+    `date` DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
+    FOREIGN KEY (`task_id`) REFERENCES `tasks`(`id`)
+);
