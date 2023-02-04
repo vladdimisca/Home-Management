@@ -5,29 +5,29 @@ import com.amss.homemanagement.dto.TaskDto;
 import com.amss.homemanagement.mapper.TaskMapper;
 import com.amss.homemanagement.model.Task;
 import com.amss.homemanagement.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/families/{familyId}/tasks")
+@RequestMapping("/api/tasks")
 @RequiredArgsConstructor
 public class TaskController {
 
     private final TaskService taskService;
     private final TaskMapper taskMapper;
 
-    /*
     @PostMapping
-
     public ResponseEntity<TaskDto> create(@Valid @RequestBody TaskDto taskDto) {
-        Task task = taskMapper.mapToEntity(taskDto);
+        Task task = taskService.create(taskMapper.mapToEntity(taskDto), taskDto.familyId(), taskDto.assigneeId());
         return ResponseEntity
-                .created(URI.create("/api/families/{familyId}/tasks" + task.getId()))
-                .body(taskMapper.mapToDto(taskService.create(task)));
+                .created(URI.create("/api/tasks/" + task.getId()))
+                .body(taskMapper.mapToDto(task));
     }
 
     @PutMapping("/{id}")
@@ -35,7 +35,6 @@ public class TaskController {
         Task task = taskService.updateById(id, taskMapper.mapToEntity(taskDto));
         return ResponseEntity.ok(taskMapper.mapToDto(task));
     }
-    */
 
     @GetMapping("/{id}")
     public ResponseEntity<TaskDto> getById(@PathVariable("id") UUID id) {
@@ -43,9 +42,9 @@ public class TaskController {
         return ResponseEntity.ok(taskMapper.mapToDto(task));
     }
 
-    @GetMapping
-    public ResponseEntity<List<TaskDto>> getAll() {
-        List<Task> tasks = taskService.getAll();
+    @GetMapping("/family/{familyId}")
+    public ResponseEntity<List<TaskDto>> getAllByFamilyId(@PathVariable("familyId") UUID familyId) {
+        List<Task> tasks = taskService.getAllByFamilyId(familyId);
         return ResponseEntity.ok(tasks.stream().map(taskMapper::mapToDto).toList());
     }
 
@@ -54,5 +53,4 @@ public class TaskController {
         taskService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-
 }

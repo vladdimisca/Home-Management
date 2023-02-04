@@ -2,8 +2,6 @@ package com.amss.homemanagement.service;
 
 import com.amss.homemanagement.exception.ErrorMessage;
 import com.amss.homemanagement.exception.ExceptionFactory;
-import com.amss.homemanagement.exception.model.ConflictException;
-import com.amss.homemanagement.exception.model.ForbiddenException;
 import com.amss.homemanagement.model.Family;
 import com.amss.homemanagement.model.FamilyMember;
 import com.amss.homemanagement.model.User;
@@ -40,7 +38,7 @@ public class FamilyService {
     public Family updateById(UUID id, Family family) {
         User user = userService.getById(securityService.getUserId());
         Family existingFamily = getById(id);
-        checkUserIsFamilyMemberWithAdminRights(user, family);
+        checkUserIsFamilyMemberWithAdminRights(user, existingFamily);
 
         existingFamily.setName(family.getName());
         return familyRepository.save(existingFamily);
@@ -55,15 +53,12 @@ public class FamilyService {
         Family family = getById(id);
         checkUserIsFamilyMemberWithAdminRights(user, family);
 
-        familyRepository.delete(getById(id));
+        familyRepository.delete(family);
     }
 
-    public void joinFamily(UUID id) {
-        Family family = getById(id);
-        User user = userService.getById(securityService.getUserId());
-
+    public void addMember(User user, Family family) {
         if (getFamilyMember(user, family).isPresent()) {
-            throw new ConflictException(ErrorMessage.ALREADY_PART_OF_FAMILY);
+            throw new ExceptionFactory().createException(HttpStatus.CONFLICT, ErrorMessage.ALREADY_EXISTS, "Member");
         }
         FamilyMember familyMember = createFamilyMember(user, family, false);
         family.getFamilyMembers().add(familyMember);
@@ -82,7 +77,7 @@ public class FamilyService {
         // A user which is not family member with admin rights is not allowed to update/delete the family
         Optional<FamilyMember> familyMember = getFamilyMember(user, family);
         if (familyMember.isEmpty() || Boolean.FALSE.equals(familyMember.get().getIsAdmin())) {
-            throw new ForbiddenException(ErrorMessage.MUST_BE_ADMIN_FAMILY_MEMBER);
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.MUST_BE_ADMIN_FAMILY_MEMBER);
         }
     }
 

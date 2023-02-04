@@ -16,6 +16,6 @@ public interface FamilyRepository extends JpaRepository<Family, UUID> {
         SELECT f FROM Family f
         JOIN FamilyMember fm ON fm.family = f
         WHERE fm.member.id = :userId
-    """)
+        """)
     List<Family> findAllByUserId(@Param("userId") UUID userId);
 }

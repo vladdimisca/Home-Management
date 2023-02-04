@@ -67,13 +67,15 @@ public class UserService {
 
     private void checkEmailNotUsed(String email) {
         if (userRepository.existsByEmail(email)) {
-            throw new ExceptionFactory().createException(HttpStatus.CONFLICT, ErrorMessage.ALREADY_EXISTS, "Email");
+            throw new ExceptionFactory().createException(HttpStatus.CONFLICT,
+                    ErrorMessage.ALREADY_EXISTS, "A user with this email");
         }
     }
 
     private void checkPhoneNumberNotUsed(String phoneNumber) {
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
-            throw new ExceptionFactory().createException(HttpStatus.CONFLICT, ErrorMessage.ALREADY_EXISTS, "Phone number");
+            throw new ExceptionFactory().createException(HttpStatus.CONFLICT,
+                    ErrorMessage.ALREADY_EXISTS, "A user with this phone number");
         }
     }
 }

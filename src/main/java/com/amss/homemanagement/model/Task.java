@@ -14,6 +14,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "tasks")
 public class Task {
+
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
@@ -37,18 +38,24 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private Priority priority;
 
-    @Column(name = "date")
-    private LocalDateTime date;
+    @Column(name = "creation_date")
+    private LocalDateTime creationDate;
 
     @ManyToOne
     @JoinColumn(name = "family_id", referencedColumnName = "id")
     private Family family;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    @JoinColumn(name = "creator_id", referencedColumnName = "id")
+    private User creator;
+
+    @ManyToOne
+    @JoinColumn(name = "assignee_id", referencedColumnName = "id")
+    private User assignee;
 
     @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-    List<Notification> notifications = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    private List<Notification> notifications = new ArrayList<>();
 }
