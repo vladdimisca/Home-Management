@@ -40,7 +40,9 @@ public class TaskService {
         task.setFamily(family);
         task.setCreationDate(LocalDateTime.now());
         task.setState(TO_DO);
-        task.setAssignee(userService.getById(assigneeId));
+
+        User assignee = assigneeId != null ? userService.getById(assigneeId) : null;
+        task.setAssignee(assignee);
         return taskRepository.save(task);
     }
 
