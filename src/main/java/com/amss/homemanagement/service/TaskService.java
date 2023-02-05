@@ -34,7 +34,7 @@ public class TaskService {
         User creator = userService.getById(securityService.getUserId());
         Family family = familyService.getById(familyId);
         if (familyService.getFamilyMember(creator, family).isEmpty()) {
-            throw new ForbiddenException(ErrorMessage.NOT_PART_OF_FAMILY);
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.NOT_PART_OF_FAMILY);
         }
 
         task.setCreator(creator);
@@ -57,7 +57,7 @@ public class TaskService {
         Task task = taskRepository.findById(id).orElseThrow(() ->
                 new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "task", id));
         if (familyService.getFamilyMember(user, task.getFamily()).isEmpty()) {
-            throw new ForbiddenException(ErrorMessage.NOT_PART_OF_FAMILY);
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.NOT_PART_OF_FAMILY);
         }
         return task;
     }
@@ -80,6 +80,8 @@ public class TaskService {
     }
 
     public void deleteById(UUID id) {
+        Task task = getById(id);
+        securityService.authorize(task.getCreator().getId());
         taskRepository.delete(getById(id));
     }
 
@@ -87,7 +89,7 @@ public class TaskService {
         User user = userService.getById(securityService.getUserId());
         Task task = getById(taskId);
         if (familyService.getFamilyMember(user, task.getFamily()).isEmpty()) {
-            throw new ForbiddenException(ErrorMessage.NOT_PART_OF_FAMILY);
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.NOT_PART_OF_FAMILY);
         }
         return task.getNotifications();
     }

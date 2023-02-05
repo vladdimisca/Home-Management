@@ -52,7 +52,7 @@ public class LikeService {
         User user = userService.getById(securityService.getUserId());
         Comment comment = commentService.getById(commentId);
         if (familyService.getFamilyMember(user, comment.getTask().getFamily()).isEmpty()) {
-            throw new ForbiddenException(ErrorMessage.NOT_PART_OF_FAMILY);
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.NOT_PART_OF_FAMILY);
         }
         return likeRepository.findLikesByCommentId(commentId);
     }

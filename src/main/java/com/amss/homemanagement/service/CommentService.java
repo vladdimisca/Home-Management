@@ -38,7 +38,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
                 new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "comment", commentId));
         if (familyService.getFamilyMember(user, comment.getTask().getFamily()).isEmpty()) {
-            throw new ForbiddenException(ErrorMessage.NOT_PART_OF_FAMILY);
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.NOT_PART_OF_FAMILY);
         }
         return comment;
     }
@@ -62,7 +62,7 @@ public class CommentService {
         User user = userService.getById(securityService.getUserId());
         Task task = taskService.getById(taskId);
         if (familyService.getFamilyMember(user, task.getFamily()).isEmpty()) {
-            throw new ForbiddenException(ErrorMessage.NOT_PART_OF_FAMILY);
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.NOT_PART_OF_FAMILY);
         }
         return commentRepository.findCommentsByTaskId(taskId);
     }
