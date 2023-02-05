@@ -62,4 +62,10 @@ public class FamilyController {
         familyService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/member/{userId}/{familyId}")
+    public ResponseEntity<?> delete(@PathVariable("userId") UUID userId, @PathVariable("familyId") UUID familyId) {
+        familyService.deleteMember(userId, familyId);
+        return ResponseEntity.noContent().build();
+    }
 }

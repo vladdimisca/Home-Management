@@ -4,6 +4,7 @@ import com.amss.homemanagement.exception.ErrorMessage;
 import com.amss.homemanagement.exception.ExceptionFactory;
 import com.amss.homemanagement.exception.model.ForbiddenException;
 import com.amss.homemanagement.model.Family;
+import com.amss.homemanagement.model.Notification;
 import com.amss.homemanagement.model.Task;
 import com.amss.homemanagement.model.User;
 import com.amss.homemanagement.repository.TaskRepository;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static com.amss.homemanagement.model.State.TO_DO;
@@ -79,5 +81,14 @@ public class TaskService {
 
     public void deleteById(UUID id) {
         taskRepository.delete(getById(id));
+    }
+
+    public List<Notification> getNotificationsByTaskId(UUID taskId) {
+        User user = userService.getById(securityService.getUserId());
+        Task task = getById(taskId);
+        if (familyService.getFamilyMember(user, task.getFamily()).isEmpty()) {
+            throw new ForbiddenException(ErrorMessage.NOT_PART_OF_FAMILY);
+        }
+        return task.getNotifications();
     }
 }

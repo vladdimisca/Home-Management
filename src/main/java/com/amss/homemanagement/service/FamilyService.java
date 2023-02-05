@@ -75,6 +75,20 @@ public class FamilyService {
         familyRepository.save(family);
     }
 
+    public void deleteMember(UUID userId, UUID familyId) {
+        User userToBeRemoved = userService.getById(userId);
+        User loggedUser = userService.getById(securityService.getUserId());
+        Family family = getById(familyId);
+        checkUserIsFamilyMemberWithAdminRights(loggedUser, family);
+        if (getFamilyMember(userToBeRemoved, family).isPresent()) {
+            family.getFamilyMembers().remove(getFamilyMember(userToBeRemoved, family).get());
+            familyRepository.save(family);
+        }
+        else {
+            new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "member", userToBeRemoved.getId());
+        }
+    }
+
     private FamilyMember createFamilyMember(User user, Family family, boolean isAdmin) {
         FamilyMember familyMember = new FamilyMember();
         familyMember.setIsAdmin(isAdmin);

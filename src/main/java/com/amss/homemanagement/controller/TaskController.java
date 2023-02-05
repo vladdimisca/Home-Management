@@ -1,8 +1,11 @@
 package com.amss.homemanagement.controller;
 
 
+import com.amss.homemanagement.dto.NotificationDto;
 import com.amss.homemanagement.dto.TaskDto;
+import com.amss.homemanagement.mapper.NotificationMapper;
 import com.amss.homemanagement.mapper.TaskMapper;
+import com.amss.homemanagement.model.Notification;
 import com.amss.homemanagement.model.Task;
 import com.amss.homemanagement.service.TaskService;
 import jakarta.validation.Valid;
@@ -21,6 +24,7 @@ public class TaskController {
 
     private final TaskService taskService;
     private final TaskMapper taskMapper;
+    private final NotificationMapper notificationMapper;
 
     @PostMapping
     public ResponseEntity<TaskDto> create(@Valid @RequestBody TaskDto taskDto) {
@@ -40,6 +44,12 @@ public class TaskController {
     public ResponseEntity<TaskDto> getById(@PathVariable("id") UUID id) {
         Task task = taskService.getById(id);
         return ResponseEntity.ok(taskMapper.mapToDto(task));
+    }
+
+    @GetMapping("/{taskId}/notifications")
+    public ResponseEntity<List<NotificationDto>> getNotificationsByTaskId(@PathVariable("taskId") UUID taskId) {
+        List<Notification> notifications = taskService.getNotificationsByTaskId(taskId);
+        return ResponseEntity.ok(notifications.stream().map(notificationMapper::mapToDto).toList());
     }
 
     @DeleteMapping("/{id}")
