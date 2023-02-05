@@ -31,7 +31,7 @@ public class TaskService {
     public Task create(Task task, UUID familyId, UUID assigneeId) {
         User creator = userService.getById(securityService.getUserId());
         Family family = familyService.getById(familyId);
-        if (getFamilyMember(creator, family).isEmpty()) {
+        if (familyService.getFamilyMember(creator, family).isEmpty()) {
             throw new ForbiddenException(ErrorMessage.FORBIDDEN); //TODO: Change message
         }
 
@@ -54,20 +54,26 @@ public class TaskService {
         User user = userService.getById(securityService.getUserId());
         Task task = taskRepository.findById(id).orElseThrow(() ->
                 new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "task", id));
-        if (getFamilyMember(user, task.getFamily()).isEmpty()) {
+        if (familyService.getFamilyMember(user, task.getFamily()).isEmpty()) {
             throw new ForbiddenException(ErrorMessage.FORBIDDEN); // TODO: Change message
         }
         return task;
     }
 
+    @Transactional
     public Task updateById(UUID id, Task task) {
         Task existingTask = getById(id);
         existingTask.setState(task.getState());
         existingTask.setDescription(task.getDescription());
         existingTask.setPriority(task.getPriority());
         existingTask.setTitle(task.getTitle());
-        // TODO: sent email
-        existingTask.setAssignee(task.getAssignee());
+
+        if(!existingTask.getAssignee().getId().equals(task.getAssignee().getId())) {
+            existingTask.setAssignee(userService.getById(task.getAssignee().getId()));
+            Task persistedTask = taskRepository.save(existingTask);
+            notificationService.create(persistedTask.getAssignee(), persistedTask);
+            return persistedTask;
+        }
         return taskRepository.save(existingTask);
     }
 
@@ -77,11 +83,5 @@ public class TaskService {
 
     public void deleteById(UUID id) {
         taskRepository.delete(getById(id));
-    }
-
-    public Optional<FamilyMember> getFamilyMember(User user, Family family) {
-        return user.getFamilyMembers().stream()
-                .filter(familyMember -> familyMember.getFamily().equals(family))
-                .findFirst();
     }
 }

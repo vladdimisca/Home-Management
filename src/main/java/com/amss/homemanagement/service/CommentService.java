@@ -4,6 +4,7 @@ import com.amss.homemanagement.exception.ErrorMessage;
 import com.amss.homemanagement.exception.ExceptionFactory;
 import com.amss.homemanagement.exception.model.ForbiddenException;
 import com.amss.homemanagement.model.Comment;
+import com.amss.homemanagement.model.Task;
 import com.amss.homemanagement.model.User;
 import com.amss.homemanagement.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,8 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserService userService;
     private final SecurityService securityService;
-
     private final TaskService taskService;
+    private final FamilyService familyService;
 
     public Comment create(Comment comment, UUID taskId) {
         User user = userService.getById(securityService.getUserId());
@@ -36,7 +37,7 @@ public class CommentService {
         User user = userService.getById(securityService.getUserId());
         Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
                 new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "comment", commentId));
-        if (taskService.getFamilyMember(user, comment.getTask().getFamily()).isEmpty()) {
+        if (familyService.getFamilyMember(user, comment.getTask().getFamily()).isEmpty()) {
             throw new ForbiddenException(ErrorMessage.FORBIDDEN); // TODO: Change message
         }
         return comment;
@@ -58,7 +59,11 @@ public class CommentService {
     }
 
     public List<Comment> getByTaskId(UUID taskId) {
-        taskService.getById(taskId);
+        User user = userService.getById(securityService.getUserId());
+        Task task = taskService.getById(taskId);
+        if (familyService.getFamilyMember(user, task.getFamily()).isEmpty()) {
+            throw new ForbiddenException(ErrorMessage.FORBIDDEN); // TODO: Change message
+        }
         return commentRepository.findCommentsByTaskId(taskId);
     }
 

@@ -9,8 +9,13 @@ import org.mapstruct.Mapping;
 public interface TaskMapper {
 
     @Mapping(source = "family.id", target = "familyId")
+    @Mapping(source = "assignee.id", target = "assigneeId")
+    @Mapping(source = "creator.id", target = "creatorId")
     TaskDto mapToDto(Task task);
 
+    @Mapping(source = "familyId", target = "family.id")
+    @Mapping(source = "assigneeId", target = "assignee.id")
+    @Mapping(source = "creatorId", target = "creator.id")
     Task mapToEntity(TaskDto taskDto);
 
 }

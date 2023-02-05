@@ -30,7 +30,7 @@ public record TaskDto(
         @NotNull
         UUID familyId,
 
-        @Null
+
         UUID creatorId,
 
         UUID assigneeId
