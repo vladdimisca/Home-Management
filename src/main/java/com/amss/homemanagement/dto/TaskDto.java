@@ -3,6 +3,7 @@ package com.amss.homemanagement.dto;
 import com.amss.homemanagement.model.Priority;
 import com.amss.homemanagement.model.State;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 
 import java.time.LocalDateTime;
@@ -20,11 +21,17 @@ public record TaskDto(
 
         State state,
 
+        @NotNull
         Priority priority,
 
-        LocalDateTime date,
+        @Null
+        LocalDateTime creationDate,
 
+        @NotNull
         UUID familyId,
+
+        @Null
+        UUID creatorId,
 
         UUID assigneeId
 

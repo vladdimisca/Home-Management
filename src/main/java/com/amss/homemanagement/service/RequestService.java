@@ -47,7 +47,6 @@ public class RequestService {
         if (!request.getUser().equals(user) && (member.isEmpty() || !member.get().getIsAdmin())) {
             throw new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "request", id);
         }
-
         return request;
     }
 

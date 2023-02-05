@@ -6,14 +6,13 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
+
 
 @Data
 @Entity
-@Table(name = "comments")
-public class Comment {
+@Table(name = "notifications")
+public class Notification {
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -24,11 +23,8 @@ public class Comment {
     @JdbcTypeCode(java.sql.Types.VARCHAR)
     private UUID id;
 
-    @Column(name = "content")
-    private String content;
-
-    @Column(name = "creation_date")
-    private LocalDateTime creationDate;
+    @Column(name = "date")
+    private LocalDateTime date;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -38,6 +34,4 @@ public class Comment {
     @JoinColumn(name = "task_id", referencedColumnName = "id")
     private Task task;
 
-    @OneToMany(mappedBy = "comment", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-    private List<Like> likes = new ArrayList<>();
 }

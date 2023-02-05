@@ -3,11 +3,9 @@ package com.amss.homemanagement.service;
 import com.amss.homemanagement.exception.ErrorMessage;
 import com.amss.homemanagement.exception.ExceptionFactory;
 import com.amss.homemanagement.exception.model.ForbiddenException;
-import com.amss.homemanagement.model.Family;
-import com.amss.homemanagement.model.FamilyMember;
-import com.amss.homemanagement.model.Task;
-import com.amss.homemanagement.model.User;
+import com.amss.homemanagement.model.*;
 import com.amss.homemanagement.repository.TaskRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,8 +25,9 @@ public class TaskService {
     private final UserService userService;
     private final SecurityService securityService;
     private final FamilyService familyService;
+    private final NotificationService notificationService;
 
-
+    @Transactional
     public Task create(Task task, UUID familyId, UUID assigneeId) {
         User creator = userService.getById(securityService.getUserId());
         Family family = familyService.getById(familyId);
@@ -40,7 +39,14 @@ public class TaskService {
         task.setFamily(family);
         task.setCreationDate(LocalDateTime.now());
         task.setState(TO_DO);
-        task.setAssignee(userService.getById(assigneeId));
+
+        if (assigneeId != null) {
+            User assignee = userService.getById(assigneeId);
+            task.setAssignee(assignee);
+            Task persistedTask = taskRepository.save(task);
+            notificationService.create(assignee, persistedTask);
+            return persistedTask;
+        }
         return taskRepository.save(task);
     }
 
@@ -60,6 +66,7 @@ public class TaskService {
         existingTask.setDescription(task.getDescription());
         existingTask.setPriority(task.getPriority());
         existingTask.setTitle(task.getTitle());
+        // TODO: sent email
         existingTask.setAssignee(task.getAssignee());
         return taskRepository.save(existingTask);
     }
