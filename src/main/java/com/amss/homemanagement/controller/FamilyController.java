@@ -1,10 +1,13 @@
 package com.amss.homemanagement.controller;
 
 import com.amss.homemanagement.dto.FamilyDto;
+import com.amss.homemanagement.dto.FamilyMemberDto;
 import com.amss.homemanagement.dto.TaskDto;
 import com.amss.homemanagement.mapper.FamilyMapper;
+import com.amss.homemanagement.mapper.FamilyMemberMapper;
 import com.amss.homemanagement.mapper.TaskMapper;
 import com.amss.homemanagement.model.Family;
+import com.amss.homemanagement.model.FamilyMember;
 import com.amss.homemanagement.model.Task;
 import com.amss.homemanagement.service.FamilyService;
 import jakarta.validation.Valid;
@@ -24,6 +27,7 @@ public class FamilyController {
     private final FamilyService familyService;
     private final FamilyMapper familyMapper;
     private final TaskMapper taskMapper;
+    private final FamilyMemberMapper familyMemberMapper;
 
     @PostMapping
     public ResponseEntity<FamilyDto> create(@Valid @RequestBody FamilyDto familyDto) {
@@ -57,6 +61,12 @@ public class FamilyController {
         return ResponseEntity.ok(tasks.stream().map(taskMapper::mapToDto).toList());
     }
 
+    @GetMapping("/{id}/members")
+    public ResponseEntity<List<FamilyMemberDto>> getFamilyMembersByFamilyId(@PathVariable("id") UUID familyId) {
+        List<FamilyMember> familyMembers = familyService.getFamilyMembersByFamilyId(familyId);
+        return ResponseEntity.ok(familyMembers.stream().map(familyMemberMapper::mapToDto).toList());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") UUID id) {
         familyService.deleteById(id);
@@ -67,5 +77,11 @@ public class FamilyController {
     public ResponseEntity<?> delete(@PathVariable("userId") UUID userId, @PathVariable("familyId") UUID familyId) {
         familyService.deleteMember(userId, familyId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping
+    public ResponseEntity<FamilyMemberDto> updateFamilyMember(@Valid @RequestBody FamilyMemberDto familyMemberDto) {
+        FamilyMember familyMember = familyService.updateFamilyMember(familyMemberMapper.mapToEntity(familyMemberDto));
+        return ResponseEntity.ok(familyMemberMapper.mapToDto(familyMember));
     }
 }
