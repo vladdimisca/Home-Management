@@ -4,6 +4,8 @@ import com.amss.homemanagement.exception.ErrorMessage;
 import com.amss.homemanagement.exception.ExceptionFactory;
 import com.amss.homemanagement.model.*;
 import com.amss.homemanagement.repository.FamilyRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ public class FamilyService {
     private final FamilyRepository familyRepository;
     private final UserService userService;
     private final SecurityService securityService;
+    private final EntityManager em;
 
     public Family create(Family family) {
         User user = userService.getById(securityService.getUserId());
@@ -55,10 +58,14 @@ public class FamilyService {
         return family.getTasks();
     }
 
+    @Transactional
     public void deleteById(UUID id) {
         User user = userService.getById(securityService.getUserId());
         Family family = getById(id);
         checkUserIsFamilyMemberWithAdminRights(user, family);
+
+        familyRepository.deleteFamilyMembersByFamilyId(family.getId());
+        family.getFamilyMembers().clear();
 
         familyRepository.delete(family);
     }

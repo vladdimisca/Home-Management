@@ -3,6 +3,7 @@ package com.amss.homemanagement.repository;
 import com.amss.homemanagement.model.Family;
 import com.amss.homemanagement.model.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -19,4 +20,10 @@ public interface FamilyRepository extends JpaRepository<Family, UUID> {
         WHERE fm.member.id = :userId
         """)
     List<Family> findAllByUserId(@Param("userId") UUID userId);
+
+    @Modifying
+    @Query("""
+        DELETE FROM FamilyMember fm WHERE fm.family.id = :familyId
+        """)
+    void deleteFamilyMembersByFamilyId(@Param("familyId") UUID familyId);
 }
