@@ -60,13 +60,6 @@ public class NotificationService {
     }
 
     public List<Notification> getByTaskId(UUID taskId) {
-        // ceva de genu trebuie aici, doar ca nu pot folosi taskService in notificationService ca imi da dependinta circulara
-        // ce sa-i faaac? :(
-//        User user = userService.getById(securityService.getUserId());
-//        Task task = taskService.getById(taskId);
-//        if (familyService.getFamilyMember(user, task.getFamily()).isEmpty()) {
-//            throw new ForbiddenException(ErrorMessage.FORBIDDEN); // TODO: Change message
-//        }
         return notificationRepository.findNotificationsByTaskId(taskId);
     }
 }

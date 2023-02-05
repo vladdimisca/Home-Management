@@ -84,4 +84,13 @@ public class TaskService {
     public void deleteById(UUID id) {
         taskRepository.delete(getById(id));
     }
+
+    public List<Notification> getNotificationsByTaskId(UUID taskId) {
+        User user = userService.getById(securityService.getUserId());
+        Task task = getById(taskId);
+        if (familyService.getFamilyMember(user, task.getFamily()).isEmpty()) {
+            throw new ForbiddenException(ErrorMessage.FORBIDDEN); // TODO: Change message
+        }
+        return notificationService.getByTaskId(taskId);
+    }
 }
