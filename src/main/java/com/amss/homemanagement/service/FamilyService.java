@@ -21,7 +21,6 @@ public class FamilyService {
     private final FamilyRepository familyRepository;
     private final UserService userService;
     private final SecurityService securityService;
-    private final EntityManager em;
 
     public Family create(Family family) {
         User user = userService.getById(securityService.getUserId());
