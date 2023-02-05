@@ -4,7 +4,6 @@ import com.amss.homemanagement.exception.ErrorMessage;
 import com.amss.homemanagement.exception.ExceptionFactory;
 import com.amss.homemanagement.model.*;
 import com.amss.homemanagement.repository.FamilyRepository;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
