@@ -80,13 +80,12 @@ public class FamilyService {
         User loggedUser = userService.getById(securityService.getUserId());
         Family family = getById(familyId);
         checkUserIsFamilyMemberWithAdminRights(loggedUser, family);
-        if (getFamilyMember(userToBeRemoved, family).isPresent()) {
-            family.getFamilyMembers().remove(getFamilyMember(userToBeRemoved, family).get());
-            familyRepository.save(family);
+        if (getFamilyMember(userToBeRemoved, family).isEmpty()) {
+            throw new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "member", userToBeRemoved.getId());
         }
-        else {
-            new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "member", userToBeRemoved.getId());
-        }
+
+        family.getFamilyMembers().remove(getFamilyMember(userToBeRemoved, family).get());
+        familyRepository.save(family);
     }
 
     private FamilyMember createFamilyMember(User user, Family family, boolean isAdmin) {

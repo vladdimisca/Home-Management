@@ -90,7 +90,7 @@ public class RequestService {
         User user = userService.getById(securityService.getUserId());
         Request request = getById(id);
         if (!request.getUser().equals(user)) {
-            throw new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "request", id);
+            throw new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.FORBIDDEN);
         }
         if (request.getStatus() != RequestStatus.PENDING) {
             throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.REQUEST_NOT_PENDING);
