@@ -2,10 +2,7 @@ package com.amss.homemanagement.service;
 
 import com.amss.homemanagement.exception.ErrorMessage;
 import com.amss.homemanagement.exception.ExceptionFactory;
-import com.amss.homemanagement.model.Family;
-import com.amss.homemanagement.model.FamilyMember;
-import com.amss.homemanagement.model.Task;
-import com.amss.homemanagement.model.User;
+import com.amss.homemanagement.model.*;
 import com.amss.homemanagement.repository.FamilyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -109,5 +106,28 @@ public class FamilyService {
         return user.getFamilyMembers().stream()
                 .filter(familyMember -> familyMember.getFamily().equals(family))
                 .findFirst();
+    }
+
+    public List<FamilyMember> getFamilyMembersByFamilyId(UUID familyId) {
+        User user = userService.getById(securityService.getUserId());
+        Family family = getById(familyId);
+        if (getFamilyMember(user, family).isEmpty()) {
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.NOT_PART_OF_FAMILY);
+        }
+        return family.getFamilyMembers();
+    }
+
+    public FamilyMember updateFamilyMember(FamilyMember familyMember) {
+        List<FamilyMember> familyMembers = getFamilyMembersByFamilyId(familyMember.getFamily().getId());
+        FamilyMember existingMember = familyMembers.stream()
+                .filter(member -> member.getMember().getId().equals(familyMember.getMember().getId()))
+                .findFirst()
+                .orElseThrow(() -> new ExceptionFactory().createException(HttpStatus.NOT_FOUND,
+            ErrorMessage.NOT_FOUND, "member", familyMember.getMember().getId()));
+
+        existingMember.setRole(familyMember.getRole());
+
+        familyRepository.save(existingMember.getFamily());
+        return existingMember;
     }
 }
