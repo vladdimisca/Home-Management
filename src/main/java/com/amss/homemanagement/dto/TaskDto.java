@@ -28,10 +28,9 @@ public record TaskDto(
         @Null
         LocalDateTime creationDate,
 
-        @NotNull
         UUID familyId,
 
-
+        @Null
         UUID creatorId,
 
         UUID assigneeId

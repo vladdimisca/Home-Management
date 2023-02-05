@@ -20,6 +20,5 @@ public record CommentDto(
         @Null
         UUID userId,
 
-        @NotNull
         UUID taskId
 ) { }

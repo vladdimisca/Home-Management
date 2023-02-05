@@ -9,9 +9,12 @@ import com.amss.homemanagement.model.Task;
 import com.amss.homemanagement.model.User;
 import com.amss.homemanagement.repository.TaskRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +24,7 @@ import static com.amss.homemanagement.model.State.TO_DO;
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class TaskService {
 
     private final TaskRepository taskRepository;
@@ -30,7 +34,7 @@ public class TaskService {
     private final NotificationService notificationService;
 
     @Transactional
-    public Task create(Task task, UUID familyId, UUID assigneeId) {
+    public Task create(Task task, @NotNull UUID familyId, UUID assigneeId) {
         User creator = userService.getById(securityService.getUserId());
         Family family = familyService.getById(familyId);
         if (familyService.getFamilyMember(creator, family).isEmpty()) {

@@ -7,9 +7,11 @@ import com.amss.homemanagement.model.Comment;
 import com.amss.homemanagement.model.Task;
 import com.amss.homemanagement.model.User;
 import com.amss.homemanagement.repository.CommentRepository;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -25,7 +28,7 @@ public class CommentService {
     private final TaskService taskService;
     private final FamilyService familyService;
 
-    public Comment create(Comment comment, UUID taskId) {
+    public Comment create(Comment comment, @NotNull UUID taskId) {
         User user = userService.getById(securityService.getUserId());
         comment.setUser(user);
         comment.setCreationDate(LocalDateTime.now());
