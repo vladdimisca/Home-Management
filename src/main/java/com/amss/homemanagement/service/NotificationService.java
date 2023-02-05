@@ -2,7 +2,6 @@ package com.amss.homemanagement.service;
 
 import com.amss.homemanagement.exception.ErrorMessage;
 import com.amss.homemanagement.exception.ExceptionFactory;
-import com.amss.homemanagement.exception.model.ForbiddenException;
 import com.amss.homemanagement.model.Notification;
 import com.amss.homemanagement.model.Task;
 import com.amss.homemanagement.model.User;
@@ -13,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -28,10 +26,11 @@ public class NotificationService {
 
     @Transactional
     public Notification create(User assignee, Task task) {
-        Notification notification = new Notification();
-        notification.setDate(LocalDateTime.now());
-        notification.setUser(assignee);
-        notification.setTask(task);
+        Notification notification = new Notification.NotificationBuilder()
+                .date(LocalDateTime.now())
+                .user(assignee)
+                .task(task)
+                .build();
         Notification persistedNotification = notificationRepository.save(notification);
         String text = String.format("""
                         Hello %s,
