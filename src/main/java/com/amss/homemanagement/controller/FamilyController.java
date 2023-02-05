@@ -8,6 +8,7 @@ import com.amss.homemanagement.mapper.FamilyMemberMapper;
 import com.amss.homemanagement.mapper.TaskMapper;
 import com.amss.homemanagement.model.Family;
 import com.amss.homemanagement.model.FamilyMember;
+import com.amss.homemanagement.model.Role;
 import com.amss.homemanagement.model.Task;
 import com.amss.homemanagement.service.FamilyService;
 import jakarta.validation.Valid;
@@ -73,15 +74,17 @@ public class FamilyController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/member/{userId}/{familyId}")
-    public ResponseEntity<?> delete(@PathVariable("userId") UUID userId, @PathVariable("familyId") UUID familyId) {
+    @DeleteMapping("/{familyId}/members/{userId}")
+    public ResponseEntity<?> delete(@PathVariable("familyId") UUID familyId, @PathVariable("userId") UUID userId) {
         familyService.deleteMember(userId, familyId);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping
-    public ResponseEntity<FamilyMemberDto> updateFamilyMember(@Valid @RequestBody FamilyMemberDto familyMemberDto) {
-        FamilyMember familyMember = familyService.updateFamilyMember(familyMemberMapper.mapToEntity(familyMemberDto));
+    @PutMapping("/{familyId}/members/{userId}")
+    public ResponseEntity<FamilyMemberDto> updateFamilyMemberRole(@PathVariable("familyId") UUID familyId,
+                                                              @PathVariable("userId") UUID userId,
+                                                              @Valid @RequestBody FamilyMemberDto familyMemberDto) {
+        FamilyMember familyMember = familyService.updateFamilyMemberRole(familyId, userId, familyMemberDto.role());
         return ResponseEntity.ok(familyMemberMapper.mapToDto(familyMember));
     }
 }

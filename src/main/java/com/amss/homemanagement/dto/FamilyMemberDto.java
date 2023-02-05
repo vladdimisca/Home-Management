@@ -13,9 +13,9 @@ public record FamilyMemberDto(
         @Null
         Boolean isAdmin,
 
-        @NotNull
+        @Null
         UUID familyId,
 
-        @NotNull
+        @Null
         UUID memberId
 ) {}

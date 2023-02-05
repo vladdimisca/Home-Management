@@ -116,15 +116,15 @@ public class FamilyService {
         return family.getFamilyMembers();
     }
 
-    public FamilyMember updateFamilyMember(FamilyMember familyMember) {
-        List<FamilyMember> familyMembers = getFamilyMembersByFamilyId(familyMember.getFamily().getId());
+    public FamilyMember updateFamilyMemberRole(UUID familyId, UUID userId, Role role) {
+        List<FamilyMember> familyMembers = getFamilyMembersByFamilyId(familyId);
         FamilyMember existingMember = familyMembers.stream()
-                .filter(member -> member.getMember().getId().equals(familyMember.getMember().getId()))
+                .filter(member -> member.getMember().getId().equals(userId))
                 .findFirst()
                 .orElseThrow(() -> new ExceptionFactory().createException(HttpStatus.NOT_FOUND,
-            ErrorMessage.NOT_FOUND, "member", familyMember.getMember().getId()));
+            ErrorMessage.NOT_FOUND, "member", userId));
 
-        existingMember.setRole(familyMember.getRole());
+        existingMember.setRole(role);
 
         familyRepository.save(existingMember.getFamily());
         return existingMember;
