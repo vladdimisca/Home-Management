@@ -42,12 +42,6 @@ public class TaskController {
         return ResponseEntity.ok(taskMapper.mapToDto(task));
     }
 
-    @GetMapping("/family/{familyId}")
-    public ResponseEntity<List<TaskDto>> getAllByFamilyId(@PathVariable("familyId") UUID familyId) {
-        List<Task> tasks = taskService.getAllByFamilyId(familyId);
-        return ResponseEntity.ok(tasks.stream().map(taskMapper::mapToDto).toList());
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") UUID id) {
         taskService.deleteById(id);

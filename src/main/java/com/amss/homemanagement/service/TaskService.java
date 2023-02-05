@@ -3,7 +3,9 @@ package com.amss.homemanagement.service;
 import com.amss.homemanagement.exception.ErrorMessage;
 import com.amss.homemanagement.exception.ExceptionFactory;
 import com.amss.homemanagement.exception.model.ForbiddenException;
-import com.amss.homemanagement.model.*;
+import com.amss.homemanagement.model.Family;
+import com.amss.homemanagement.model.Task;
+import com.amss.homemanagement.model.User;
 import com.amss.homemanagement.repository.TaskRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.amss.homemanagement.model.State.TO_DO;
@@ -32,7 +32,7 @@ public class TaskService {
         User creator = userService.getById(securityService.getUserId());
         Family family = familyService.getById(familyId);
         if (familyService.getFamilyMember(creator, family).isEmpty()) {
-            throw new ForbiddenException(ErrorMessage.FORBIDDEN); //TODO: Change message
+            throw new ForbiddenException(ErrorMessage.NOT_PART_OF_FAMILY);
         }
 
         task.setCreator(creator);
@@ -55,7 +55,7 @@ public class TaskService {
         Task task = taskRepository.findById(id).orElseThrow(() ->
                 new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "task", id));
         if (familyService.getFamilyMember(user, task.getFamily()).isEmpty()) {
-            throw new ForbiddenException(ErrorMessage.FORBIDDEN); // TODO: Change message
+            throw new ForbiddenException(ErrorMessage.NOT_PART_OF_FAMILY);
         }
         return task;
     }
@@ -75,10 +75,6 @@ public class TaskService {
             return persistedTask;
         }
         return taskRepository.save(existingTask);
-    }
-
-    public List<Task> getAllByFamilyId(UUID familyId) {
-        return taskRepository.findByFamily_Id(familyId);
     }
 
     public void deleteById(UUID id) {

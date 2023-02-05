@@ -1,8 +1,11 @@
 package com.amss.homemanagement.controller;
 
 import com.amss.homemanagement.dto.FamilyDto;
+import com.amss.homemanagement.dto.TaskDto;
 import com.amss.homemanagement.mapper.FamilyMapper;
+import com.amss.homemanagement.mapper.TaskMapper;
 import com.amss.homemanagement.model.Family;
+import com.amss.homemanagement.model.Task;
 import com.amss.homemanagement.service.FamilyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ public class FamilyController {
 
     private final FamilyService familyService;
     private final FamilyMapper familyMapper;
+    private final TaskMapper taskMapper;
 
     @PostMapping
     public ResponseEntity<FamilyDto> create(@Valid @RequestBody FamilyDto familyDto) {
@@ -45,6 +49,12 @@ public class FamilyController {
     public ResponseEntity<List<FamilyDto>> getAll(@RequestParam(value = "asMember", required = false) boolean asMember) {
         List<Family> families = familyService.getAll(asMember);
         return ResponseEntity.ok(families.stream().map(familyMapper::mapToDto).toList());
+    }
+
+    @GetMapping("/{id}/tasks")
+    public ResponseEntity<List<TaskDto>> getTasksByFamilyId(@PathVariable("id") UUID familyId) {
+        List<Task> tasks = familyService.getTasksByFamilyId(familyId);
+        return ResponseEntity.ok(tasks.stream().map(taskMapper::mapToDto).toList());
     }
 
     @DeleteMapping("/{id}")

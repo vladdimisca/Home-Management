@@ -4,6 +4,7 @@ import com.amss.homemanagement.exception.ErrorMessage;
 import com.amss.homemanagement.exception.ExceptionFactory;
 import com.amss.homemanagement.model.Family;
 import com.amss.homemanagement.model.FamilyMember;
+import com.amss.homemanagement.model.Task;
 import com.amss.homemanagement.model.User;
 import com.amss.homemanagement.repository.FamilyRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,15 @@ public class FamilyService {
 
     public List<Family> getAll(boolean asMember) {
         return asMember ? familyRepository.findAllByUserId(securityService.getUserId()) : familyRepository.findAll();
+    }
+
+    public List<Task> getTasksByFamilyId(UUID familyId) {
+        User user = userService.getById(securityService.getUserId());
+        Family family = getById(familyId);
+        if (getFamilyMember(user, family).isEmpty()) {
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.NOT_PART_OF_FAMILY);
+        }
+        return family.getTasks();
     }
 
     public void deleteById(UUID id) {

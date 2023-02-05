@@ -41,7 +41,8 @@ public class RequestService {
 
     public Request getById(UUID id) {
         User user = userService.getById(securityService.getUserId());
-        Request request = fetchRequestById(id);
+        Request request = requestRepository.findById(id).orElseThrow(() ->
+                new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "request", id));
 
         Optional<FamilyMember> member = familyService.getFamilyMember(user, request.getFamily());
         if (!request.getUser().equals(user) && (member.isEmpty() || !member.get().getIsAdmin())) {
@@ -53,14 +54,14 @@ public class RequestService {
     @Transactional
     public Request updateStatusById(UUID id, RequestStatus requestStatus) {
         User user = userService.getById(securityService.getUserId());
-        Request existingRequest = fetchRequestById(id);
+        Request existingRequest = getById(id);
         Optional<FamilyMember> member = familyService.getFamilyMember(user, existingRequest.getFamily());
 
         if (member.isEmpty() || !member.get().getIsAdmin()) {
-            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.FORBIDDEN);
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.MUST_BE_ADMIN_FAMILY_MEMBER);
         }
         if (existingRequest.getStatus() != RequestStatus.PENDING) {
-            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.FORBIDDEN); // TODO: Change error message
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.REQUEST_NOT_PENDING);
         }
         if (requestStatus == RequestStatus.ACCEPTED) {
             familyService.addMember(existingRequest.getUser(), existingRequest.getFamily());
@@ -74,11 +75,11 @@ public class RequestService {
         User user = userService.getById(securityService.getUserId());
         Family family = familyService.getById(familyId);
         Optional<FamilyMember> member = familyService.getFamilyMember(user, family);
-        List<Request> requests = requestRepository.findByFamily_IdAndStatus(familyId, status);
-
         if (member.isEmpty()) {
-            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.FORBIDDEN);
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.NOT_PART_OF_FAMILY);
         }
+
+        List<Request> requests = requestRepository.findByFamily_IdAndStatus(familyId, status);
         if (member.get().getIsAdmin()) {
             return requests;
         }
@@ -87,18 +88,15 @@ public class RequestService {
 
     public void deleteById(UUID id) {
         User user = userService.getById(securityService.getUserId());
-        Request request = fetchRequestById(id);
-        // TODO: check if the user is an admin and allow only pending requests to be deleted
+        Request request = getById(id);
         if (!request.getUser().equals(user)) {
             throw new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "request", id);
         }
+        if (request.getStatus() != RequestStatus.PENDING) {
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.REQUEST_NOT_PENDING);
+        }
 
         requestRepository.delete(getById(id));
-    }
-
-    private Request fetchRequestById(UUID id) {
-        return requestRepository.findById(id).orElseThrow(() ->
-                new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "request", id));
     }
 
     private boolean hasAnyPendingRequest(User user, Family family) {

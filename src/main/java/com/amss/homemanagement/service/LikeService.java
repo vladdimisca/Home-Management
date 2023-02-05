@@ -43,7 +43,7 @@ public class LikeService {
         Like like = likeRepository.findById(likeId).orElseThrow(() ->
                 new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "like", likeId));
         if (familyService.getFamilyMember(user, like.getComment().getTask().getFamily()).isEmpty()) {
-            throw new ForbiddenException(ErrorMessage.FORBIDDEN); // TODO: Change message
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.NOT_PART_OF_FAMILY);
         }
         return like;
     }
@@ -52,7 +52,7 @@ public class LikeService {
         User user = userService.getById(securityService.getUserId());
         Comment comment = commentService.getById(commentId);
         if (familyService.getFamilyMember(user, comment.getTask().getFamily()).isEmpty()) {
-            throw new ForbiddenException(ErrorMessage.FORBIDDEN); // TODO: Change message
+            throw new ForbiddenException(ErrorMessage.NOT_PART_OF_FAMILY);
         }
         return likeRepository.findLikesByCommentId(commentId);
     }

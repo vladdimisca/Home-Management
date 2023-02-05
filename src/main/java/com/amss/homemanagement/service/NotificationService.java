@@ -54,7 +54,7 @@ public class NotificationService {
         Notification notification = notificationRepository.findById(id).orElseThrow(() ->
                 new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "notification", id));
         if (familyService.getFamilyMember(user, notification.getTask().getFamily()).isEmpty()) {
-            throw new ForbiddenException(ErrorMessage.FORBIDDEN); // TODO: Change message
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.NOT_PART_OF_FAMILY);
         }
         return notification;
     }
@@ -65,7 +65,7 @@ public class NotificationService {
 //        User user = userService.getById(securityService.getUserId());
 //        Task task = taskService.getById(taskId);
 //        if (familyService.getFamilyMember(user, task.getFamily()).isEmpty()) {
-//            throw new ForbiddenException(ErrorMessage.FORBIDDEN); // TODO: Change message
+//            throw new ForbiddenException(ErrorMessage.FORBIDDEN);
 //        }
         return notificationRepository.findNotificationsByTaskId(taskId);
     }

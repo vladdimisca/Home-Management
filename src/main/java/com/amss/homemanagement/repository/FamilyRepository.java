@@ -1,6 +1,7 @@
 package com.amss.homemanagement.repository;
 
 import com.amss.homemanagement.model.Family;
+import com.amss.homemanagement.model.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
