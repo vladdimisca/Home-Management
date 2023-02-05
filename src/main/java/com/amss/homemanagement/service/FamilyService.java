@@ -85,6 +85,9 @@ public class FamilyService {
         if (getFamilyMember(userToBeRemoved, family).isEmpty()) {
             throw new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "member", userToBeRemoved.getId());
         }
+        if (userToBeRemoved.equals(loggedUser)) {
+            throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.MUST_NOT_BE_ADMIN_FAMILY_MEMBER);
+        }
 
         family.getFamilyMembers().remove(getFamilyMember(userToBeRemoved, family).get());
         familyRepository.save(family);
