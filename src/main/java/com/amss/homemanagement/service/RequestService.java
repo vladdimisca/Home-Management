@@ -26,7 +26,7 @@ public class RequestService {
         User user = userService.getById(securityService.getUserId());
         Family family = familyService.getById(familyId);
 
-        if (getFamilyMember(user, family).isPresent()) {
+        if (familyService.getFamilyMember(user, family).isPresent()) {
             throw new ExceptionFactory().createException(HttpStatus.CONFLICT, ErrorMessage.ALREADY_PART_OF_FAMILY, family.getId());
         }
         if (hasAnyPendingRequest(user, family)) {
@@ -43,7 +43,7 @@ public class RequestService {
         User user = userService.getById(securityService.getUserId());
         Request request = fetchRequestById(id);
 
-        Optional<FamilyMember> member = getFamilyMember(user, request.getFamily());
+        Optional<FamilyMember> member = familyService.getFamilyMember(user, request.getFamily());
         if (!request.getUser().equals(user) && (member.isEmpty() || !member.get().getIsAdmin())) {
             throw new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "request", id);
         }
@@ -54,7 +54,7 @@ public class RequestService {
     public Request updateStatusById(UUID id, RequestStatus requestStatus) {
         User user = userService.getById(securityService.getUserId());
         Request existingRequest = fetchRequestById(id);
-        Optional<FamilyMember> member = getFamilyMember(user, existingRequest.getFamily());
+        Optional<FamilyMember> member = familyService.getFamilyMember(user, existingRequest.getFamily());
 
         if (member.isEmpty() || !member.get().getIsAdmin()) {
             throw new ExceptionFactory().createException(HttpStatus.FORBIDDEN, ErrorMessage.FORBIDDEN);
@@ -73,7 +73,7 @@ public class RequestService {
     public List<Request> getAllByFamilyIdAndStatus(UUID familyId, RequestStatus status) {
         User user = userService.getById(securityService.getUserId());
         Family family = familyService.getById(familyId);
-        Optional<FamilyMember> member = getFamilyMember(user, family);
+        Optional<FamilyMember> member = familyService.getFamilyMember(user, family);
         List<Request> requests = requestRepository.findByFamily_IdAndStatus(familyId, status);
 
         if (member.isEmpty()) {
@@ -105,11 +105,5 @@ public class RequestService {
         return user.getRequests().stream()
                 .filter(req -> req.getFamily().getId().equals(family.getId()))
                 .anyMatch(req -> req.getStatus() == RequestStatus.PENDING);
-    }
-
-    private Optional<FamilyMember> getFamilyMember(User user, Family family) {
-        return user.getFamilyMembers().stream()
-                .filter(familyMember -> familyMember.getFamily().equals(family))
-                .findFirst();
     }
 }

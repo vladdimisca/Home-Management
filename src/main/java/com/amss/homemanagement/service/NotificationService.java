@@ -2,6 +2,7 @@ package com.amss.homemanagement.service;
 
 import com.amss.homemanagement.exception.ErrorMessage;
 import com.amss.homemanagement.exception.ExceptionFactory;
+import com.amss.homemanagement.exception.model.ForbiddenException;
 import com.amss.homemanagement.model.Notification;
 import com.amss.homemanagement.model.Task;
 import com.amss.homemanagement.model.User;
@@ -21,6 +22,9 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final EmailSenderService emailSenderService;
+    private final UserService userService;
+    private final SecurityService securityService;
+    private final FamilyService familyService;
 
     @Transactional
     public Notification create(User assignee, Task task) {
@@ -46,12 +50,23 @@ public class NotificationService {
     }
 
     public Notification getById(UUID id) {
-        return notificationRepository.findById(id).orElseThrow(() ->
+        User user = userService.getById(securityService.getUserId());
+        Notification notification = notificationRepository.findById(id).orElseThrow(() ->
                 new ExceptionFactory().createException(HttpStatus.NOT_FOUND, ErrorMessage.NOT_FOUND, "notification", id));
+        if (familyService.getFamilyMember(user, notification.getTask().getFamily()).isEmpty()) {
+            throw new ForbiddenException(ErrorMessage.FORBIDDEN); // TODO: Change message
+        }
+        return notification;
     }
 
-    public List<Notification> getAll() {
-        return notificationRepository.findAll();
+    public List<Notification> getByTaskId(UUID taskId) {
+        // ceva de genu trebuie aici, doar ca nu pot folosi taskService in notificationService ca imi da dependinta circulara
+        // ce sa-i faaac? :(
+//        User user = userService.getById(securityService.getUserId());
+//        Task task = taskService.getById(taskId);
+//        if (familyService.getFamilyMember(user, task.getFamily()).isEmpty()) {
+//            throw new ForbiddenException(ErrorMessage.FORBIDDEN); // TODO: Change message
+//        }
+        return notificationRepository.findNotificationsByTaskId(taskId);
     }
-
 }

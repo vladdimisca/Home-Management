@@ -81,7 +81,7 @@ public class FamilyService {
         }
     }
 
-    private Optional<FamilyMember> getFamilyMember(User user, Family family) {
+    public Optional<FamilyMember> getFamilyMember(User user, Family family) {
         return user.getFamilyMembers().stream()
                 .filter(familyMember -> familyMember.getFamily().equals(family))
                 .findFirst();

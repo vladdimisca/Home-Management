@@ -2,13 +2,16 @@ package com.amss.homemanagement.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data
+@Setter
+@Getter
 @Entity
 @Table(name = "likes")
 public class Like {
