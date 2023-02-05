@@ -2,14 +2,12 @@ package com.amss.homemanagement.service;
 
 import com.amss.homemanagement.exception.ErrorMessage;
 import com.amss.homemanagement.exception.ExceptionFactory;
-import com.amss.homemanagement.exception.model.ForbiddenException;
 import com.amss.homemanagement.model.Family;
 import com.amss.homemanagement.model.Notification;
 import com.amss.homemanagement.model.Task;
 import com.amss.homemanagement.model.User;
 import com.amss.homemanagement.repository.TaskRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

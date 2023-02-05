@@ -2,7 +2,6 @@ package com.amss.homemanagement.service;
 
 import com.amss.homemanagement.exception.ErrorMessage;
 import com.amss.homemanagement.exception.ExceptionFactory;
-import com.amss.homemanagement.exception.model.ForbiddenException;
 import com.amss.homemanagement.model.Comment;
 import com.amss.homemanagement.model.Task;
 import com.amss.homemanagement.model.User;
