@@ -39,7 +39,7 @@ public class Notification {
 
     public Notification() {}
 
-    public Notification(NotificationBuilder builder) {
+    private Notification(NotificationBuilder builder) {
         this.id = builder.id;
         this.date = builder.date;
         this.user = builder.user;
